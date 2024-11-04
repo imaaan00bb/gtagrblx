@@ -296,14 +296,14 @@ vis.newButton("Chams", "lets you see all through walls", function()
 local player = game.Players.LocalPlayer
 
 
-local function HighlightAllPlayers()
+local function chamslel()
     for _, targetPlayer in pairs(game.Players:GetPlayers()) do
-        if targetPlayer ~= player then -- Ignore local player
+        if targetPlayer ~= player then 
             local targetCharacter = targetPlayer.Character
             if targetCharacter then
 
-                if not targetCharacter:FindFirstChild("Highlight") then
-                    local highlight = Instance.new("Highlight")
+                if not targetCharacter:FindFirstChild("fgfgfg") then
+                    local highlight = Instance.new("fgfgfg")
                     highlight.Parent = targetCharacter
                     highlight.Adornee = targetCharacter
                     highlight.FillTransparency = 0.5
@@ -318,7 +318,7 @@ local function HighlightAllPlayers()
 end
 
 
-HighlightAllPlayers()
+chamslel()
 
 end)
 
