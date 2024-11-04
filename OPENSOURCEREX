@@ -1,0 +1,374 @@
+--rex gorilla tag
+local DrRayLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/DrRay-UI-Library/main/DrRay.lua"))()
+local window = DrRayLibrary:Load("Rex Utilities", "Default")
+
+local tab = DrRayLibrary.newTab("Movement", "ImageIdHere")
+tab.newButton("Speed Boost", "Gives you a speed boost for public lobbies!", function()
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 70
+end)
+
+tab.newButton("Reset Speed Boost", "Sets the speed back to normal", function()
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 30
+end)
+
+tab.newButton("Platforms", "Allows you to walk midair!", function()
+
+local Player = game:GetService("Players").LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.JumpRequest:Connect(function()
+    if Player.Character then
+        Player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+end)
+
+local adv = DrRayLibrary.newTab("Advantages", "ImageIdHere")
+adv.newButton("Tag All", "tags all players if you are it kinda works as a tag self lol", function()
+    local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = char:WaitForChild("HumanoidRootPart")
+local originalPosition = humanoidRootPart.CFrame
+
+local teleportDuration = 0.4
+local offsetDistance = 3
+
+local function teleportToPlayers()
+    local players = game.Players:GetPlayers()
+
+
+    local targetPlayers = {}
+    for _, p in ipairs(players) do
+        if p ~= player then
+            table.insert(targetPlayers, p)
+        end
+    end
+
+
+    for _, targetPlayer in ipairs(targetPlayers) do
+        if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+
+            local targetRootPart = targetPlayer.Character.HumanoidRootPart
+            local velocity = targetRootPart.Velocity
+
+            local targetPosition
+            if velocity.Magnitude > 0 then
+                 local direction = velocity.Unit
+                targetPosition = targetRootPart.CFrame + direction * offsetDistance
+            else
+               
+                targetPosition = targetRootPart.CFrame
+            end
+
+      
+            humanoidRootPart.CFrame = targetPosition
+
+       
+            wait(teleportDuration)
+        end
+    end
+
+
+    humanoidRootPart.CFrame = originalPosition
+end
+
+
+teleportToPlayers()
+
+end)
+
+adv.newButton("Tag GUI", "type a username and it tags them", function()
+    local player = game.Players.LocalPlayer
+    local char = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = char:WaitForChild("HumanoidRootPart")
+    local offsetDistance = 3 
+    
+    local originalPosition = humanoidRootPart.CFrame -- Store the original position
+    
+
+    local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    local frame = Instance.new("Frame", screenGui)
+    frame.Size = UDim2.new(0, 200, 0, 100)
+    frame.Position = UDim2.new(0, 10, 0, 10)
+    frame.BackgroundTransparency = 0.5
+    
+    local textBox = Instance.new("TextBox", frame)
+    textBox.Size = UDim2.new(0, 180, 0, 50)
+    textBox.Position = UDim2.new(0, 10, 0, 10)
+    textBox.PlaceholderText = "Enter username"
+    textBox.TextScaled = true
+    
+    local teleportButton = Instance.new("TextButton", frame)
+    teleportButton.Size = UDim2.new(0, 180, 0, 30)
+    teleportButton.Position = UDim2.new(0, 10, 0, 60)
+    teleportButton.Text = "Teleport"
+    teleportButton.TextScaled = true
+    
+   
+    local function findPlayerByPartialName(partialName)
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= player and p.Name:lower():sub(1, #partialName) == partialName:lower() then
+                return p
+            end
+        end
+        return nil
+    end
+    
+  
+    local function teleportToPlayer(targetPlayer)
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local targetRootPart = targetPlayer.Character.HumanoidRootPart
+            local velocity = targetRootPart.Velocity
+    
+            local teleportPosition
+            if velocity.Magnitude > 0 then
+               local direction = velocity.Unit 
+                teleportPosition = targetRootPart.CFrame + direction * offsetDistance
+            else
+             
+                teleportPosition = targetRootPart.CFrame
+            end
+    
+
+            originalPosition = humanoidRootPart.CFrame
+    
+            humanoidRootPart.CFrame = teleportPosition
+    
+            
+            wait(1)
+            humanoidRootPart.CFrame = originalPosition
+        end
+    end
+    
+ 
+    teleportButton.MouseButton1Click:Connect(function()
+        local partialName = textBox.Text
+        if partialName and partialName ~= "" then
+            local foundPlayer = findPlayerByPartialName(partialName)
+            if foundPlayer then
+                teleportToPlayer(foundPlayer)
+            else
+                warn("Player not found or invalid partial username.")
+            end
+        end
+    end)
+    
+end)
+
+adv.newButton("unfreeze all", "finds all frozen players and unfreezes them", function()
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+
+repeat wait() until character and character:FindFirstChild("HumanoidRootPart")
+
+
+local function TeleportToAnchoredPlayersOnce()
+    local originalCFrame = character.HumanoidRootPart.CFrame
+
+    for _, targetPlayer in pairs(game.Players:GetPlayers()) do
+        if targetPlayer ~= player then 
+            local targetCharacter = targetPlayer.Character
+            if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+                local targetHRP = targetCharacter.HumanoidRootPart
+
+         
+                if targetHRP.Anchored then
+                    character.HumanoidRootPart.CFrame = targetHRP.CFrame + Vector3.new(0, 2, 0)
+
+                    wait(0.1)
+                    character.HumanoidRootPart.CFrame = originalCFrame
+                    break
+                end
+            end
+        end
+    end
+end
+
+
+TeleportToAnchoredPlayersOnce()
+
+end)
+
+adv.newButton("unfreeze gui", "type a username and it unfreezes them", function()
+    local player = game.Players.LocalPlayer
+    local char = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = char:WaitForChild("HumanoidRootPart")
+    local offsetDistance = 3 
+    
+    local originalPosition = humanoidRootPart.CFrame 
+    
+
+    local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    local frame = Instance.new("Frame", screenGui)
+    frame.Size = UDim2.new(0, 200, 0, 100)
+    frame.Position = UDim2.new(0, 10, 0, 10)
+    frame.BackgroundTransparency = 0.5
+    
+    local textBox = Instance.new("TextBox", frame)
+    textBox.Size = UDim2.new(0, 180, 0, 50)
+    textBox.Position = UDim2.new(0, 10, 0, 10)
+    textBox.PlaceholderText = "Enter username"
+    textBox.TextScaled = true
+    
+    local teleportButton = Instance.new("TextButton", frame)
+    teleportButton.Size = UDim2.new(0, 180, 0, 30)
+    teleportButton.Position = UDim2.new(0, 10, 0, 60)
+    teleportButton.Text = "Teleport"
+    teleportButton.TextScaled = true
+    
+
+    local function findPlayerByPartialName(partialName)
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= player and p.Name:lower():sub(1, #partialName) == partialName:lower() then
+                return p
+            end
+        end
+        return nil
+    end
+    
+    local function teleportToPlayer(targetPlayer)
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local targetRootPart = targetPlayer.Character.HumanoidRootPart
+            local velocity = targetRootPart.Velocity
+    
+            local teleportPosition
+            if velocity.Magnitude > 0 then
+                               local direction = velocity.Unit
+                teleportPosition = targetRootPart.CFrame + direction * offsetDistance
+            else
+              
+                teleportPosition = targetRootPart.CFrame
+            end
+    
+           
+            originalPosition = humanoidRootPart.CFrame
+    
+         
+            humanoidRootPart.CFrame = teleportPosition
+    
+            
+            wait(0.1)
+            humanoidRootPart.CFrame = originalPosition
+        end
+    end
+    
+
+    teleportButton.MouseButton1Click:Connect(function()
+        local partialName = textBox.Text
+        if partialName and partialName ~= "" then
+            local foundPlayer = findPlayerByPartialName(partialName)
+            if foundPlayer then
+                teleportToPlayer(foundPlayer)
+            else
+                warn("Player not found or invalid partial username.")
+            end
+        end
+    end)
+end)
+
+
+adv.newButton("unfreeze self", "unfreezes urself, buggy", function()
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+
+local function UnanchorCharacter()
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Anchored = false
+        end
+    end
+end
+
+
+UnanchorCharacter()
+
+end)
+
+
+
+local vis = DrRayLibrary.newTab("Visuals", "ImageIdHere")
+vis.newButton("Chams", "lets you see all through walls", function()
+
+local player = game.Players.LocalPlayer
+
+
+local function HighlightAllPlayers()
+    for _, targetPlayer in pairs(game.Players:GetPlayers()) do
+        if targetPlayer ~= player then -- Ignore local player
+            local targetCharacter = targetPlayer.Character
+            if targetCharacter then
+
+                if not targetCharacter:FindFirstChild("Highlight") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = targetCharacter
+                    highlight.Adornee = targetCharacter
+                    highlight.FillTransparency = 0.5
+                    highlight.OutlineTransparency = 0 
+                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    highlight.FillColor = Color3.fromRGB(255, 255, 0)
+                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                end
+            end
+        end
+    end
+end
+
+
+HighlightAllPlayers()
+
+end)
+
+vis.newButton("Lag All", "lags everyone! also glitches everyone", function()
+
+local player = game.Players.LocalPlayer
+
+
+local function MakePlayersLaggy()
+    for _, targetPlayer in pairs(game.Players:GetPlayers()) do
+        if targetPlayer ~= player then 
+            local targetCharacter = targetPlayer.Character
+            if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+                local humanoidRootPart = targetCharacter:FindFirstChild("HumanoidRootPart")
+                local humanoid = targetCharacter:FindFirstChild("Humanoid")
+
+           
+                spawn(function()
+                    while targetPlayer and targetCharacter do
+                        wait(math.random(0.2, 1))
+
+                        -- Simulate slower movement
+                        if humanoid then
+                            humanoid.WalkSpeed = math.random(5, 10)
+                        end
+
+                    
+                        if humanoidRootPart then
+                            local offset = Vector3.new(
+                                math.random(-1, 1) * 0.1,
+                                0,
+                                math.random(-1, 1) * 0.1
+                            )
+                            humanoidRootPart.Position = humanoidRootPart.Position + offset
+                        end
+
+                  
+                        if math.random() < 0.2 then 
+                            local originalPosition = humanoidRootPart.Position
+                            wait(math.random(0.5, 1.5)) 
+                            humanoidRootPart.Position = originalPosition 
+                        end
+                    end
+                end)
+            end
+        end
+    end
+end
+
+
+MakePlayersLaggy()
+
+end)
